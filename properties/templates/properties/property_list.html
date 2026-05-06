@@ -1,0 +1,124 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Kayoo - Offres immobilières</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="{% static 'properties/css/style.css' %}">
+</head>
+<body>
+
+<header class="site-header">
+    <h1>Kayoo</h1>
+    <p>Maisons, terrains, appartements et offres immobilières</p>
+</header>
+
+<main class="container">
+
+    <form method="get" class="filter-box">
+       <select name="category">
+    <option value="">Toutes catégories</option>
+    {% for category in categories %}
+        <option value="{{ category.id }}"
+            {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
+            {{ category.name }}
+        </option>
+    {% endfor %}
+</select>
+
+<select name="transaction_type">
+    <option value="">Vente ou location</option>
+    <option value="vente" {% if selected_transaction_type == "vente" %}selected{% endif %}>
+        À vendre
+    </option>
+    <option value="location" {% if selected_transaction_type == "location" %}selected{% endif %}>
+        À louer
+    </option>
+</select>
+
+<select name="status">
+    <option value="">Tous statuts</option>
+    <option value="disponible" {% if selected_status == "disponible" %}selected{% endif %}>
+        Disponible
+    </option>
+    <option value="vendu" {% if selected_status == "vendu" %}selected{% endif %}>
+        Vendu
+    </option>
+    <option value="loue" {% if selected_status == "loue" %}selected{% endif %}>
+        Loué
+    </option>
+    <option value="reserve" {% if selected_status == "reserve" %}selected{% endif %}>
+        Réservé
+    </option>
+</select>
+
+<input type="text" name="city" placeholder="Ville" value="{{ selected_city }}">
+
+<input type="number" name="min_price" placeholder="Prix min" value="{{ selected_min_price }}">
+
+<input type="number" name="max_price" placeholder="Prix max" value="{{ selected_max_price }}">
+
+<select name="featured">
+    <option value="">Toutes offres</option>
+    <option value="1" {% if selected_featured == "1" %}selected{% endif %}>
+        En avant seulement
+    </option>
+</select>
+
+<button type="submit">Filtrer</button>
+
+<a href="{% url 'properties:property_list' %}" class="reset-btn">
+    Réinitialiser
+</a>
+    </form>
+
+    <section class="property-grid">
+        {% for property in properties %}
+            <article class="card">
+                <div class="card-img">
+                    {% with main_image=property.images.first %}
+                        {% if main_image %}
+                            <img src="{{ main_image.image.url }}" alt="{{ property.title }}">
+                        {% else %}
+                            <span>Aucune photo</span>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+
+                <div class="card-content">
+                    <span class="badge">{{ property.get_transaction_type_display }}</span>
+
+                    <h2>{{ property.title }}</h2>
+
+                    <p class="location">
+                        {{ property.city }}
+                        {% if property.address %}
+                            - {{ property.address }}
+                        {% endif %}
+                    </p>
+
+                    <p class="price">{{ property.price }} {{ property.currency }}</p>
+
+                    <p class="description">
+                        {{ property.short_description|truncatewords:20 }}
+                    </p>
+
+                    <a class="btn" href="{% url 'properties:property_detail' property.slug %}">
+                        Voir détails
+                    </a>
+                </div>
+            </article>
+        {% empty %}
+            <div class="empty">
+                Aucune offre trouvée pour le moment.
+            </div>
+        {% endfor %}
+    </section>
+
+</main>
+
+</body>
+</html>

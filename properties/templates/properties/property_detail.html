@@ -1,0 +1,101 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ property.title }} - Kayoo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="{% static 'properties/css/style.css' %}">
+</head>
+<body>
+
+<header class="site-header">
+    <h1>Kayoo</h1>
+    <p>Détails de l'offre immobilière</p>
+</header>
+
+<main class="detail-container">
+
+    <a href="{% url 'properties:property_list' %}" class="back-link">
+        ← Retour aux offres
+    </a>
+
+    <h1 class="detail-title">{{ property.title }}</h1>
+
+    <p class="detail-location">
+        {{ property.city }}
+        {% if property.address %}
+            - {{ property.address }}
+        {% endif %}
+    </p>
+
+    <p class="detail-price">
+        {{ property.price }} {{ property.currency }}
+    </p>
+
+    <section class="gallery">
+        {% for image in property.images.all %}
+            <img src="{{ image.image.url }}" alt="{{ image.caption|default:property.title }}">
+        {% empty %}
+            <div class="empty">Aucune photo disponible.</div>
+        {% endfor %}
+    </section>
+
+    <h2 class="section-title">Description</h2>
+
+    <div class="full-description">
+        {% if property.full_description %}
+            {{ property.full_description|linebreaks }}
+        {% else %}
+            {{ property.short_description|linebreaks }}
+        {% endif %}
+    </div>
+
+    <h2 class="section-title">Informations principales</h2>
+
+    <section class="features">
+        <div class="feature">Catégorie: {{ property.category }}</div>
+        <div class="feature">Transaction: {{ property.get_transaction_type_display }}</div>
+        <div class="feature">Statut: {{ property.get_status_display }}</div>
+
+        {% if property.area %}
+            <div class="feature">Surface: {{ property.area }} {{ property.area_unit }}</div>
+        {% endif %}
+
+        {% if property.bedrooms %}
+            <div class="feature">Chambres: {{ property.bedrooms }}</div>
+        {% endif %}
+
+        {% if property.bathrooms %}
+            <div class="feature">Toilettes / bains: {{ property.bathrooms }}</div>
+        {% endif %}
+
+        {% if property.floors %}
+            <div class="feature">Niveaux: {{ property.floors }}</div>
+        {% endif %}
+
+        <div class="feature">Eau: {% if property.has_water %}Oui{% else %}Non{% endif %}</div>
+        <div class="feature">Électricité: {% if property.has_electricity %}Oui{% else %}Non{% endif %}</div>
+        <div class="feature">Parking: {% if property.has_parking %}Oui{% else %}Non{% endif %}</div>
+        <div class="feature">Jardin: {% if property.has_garden %}Oui{% else %}Non{% endif %}</div>
+        <div class="feature">Piscine: {% if property.has_pool %}Oui{% else %}Non{% endif %}</div>
+    </section>
+
+    <div class="contact-actions">
+        <a class="whatsapp-btn"
+           href="https://wa.me/50943281595?text=Bonjour, je suis intéressé par {{ property.title }}"
+           target="_blank">
+            Contacter sur WhatsApp
+        </a>
+
+        <a class="call-btn" href="tel:+50943281595">
+            Appeler maintenant
+        </a>
+    </div>
+
+</main>
+
+</body>
+</html>
